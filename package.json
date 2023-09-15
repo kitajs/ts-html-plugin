@@ -2,8 +2,14 @@
   "name": "@kitajs/ts-html-plugin",
   "version": "1.0.0",
   "description": "Typescript LSP extension to catch XSS vulnerabilities.",
+  "bugs": "https://github.com/kitajs/ts-html-plugin/issues",
+  "repository": "https://github.com/kitajs/ts-html-plugin",
+  "funding": "https://github.com/kitajs/ts-html-plugin?sponsor=1",
   "license": "MIT",
+  "author": "arthurfiorette <npm@arthur.place>",
+  "sideEffects": false,
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
@@ -20,7 +26,7 @@
     "self": "file:."
   },
   "peerDependencies": {
-    "@kitajs/html": ">=2",
+    "@kitajs/ts-html-plugin": ">=2",
     "typescript": ">=5"
   },
   "packageManager": "pnpm@8.7.5"
