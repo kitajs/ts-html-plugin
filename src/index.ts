@@ -17,9 +17,14 @@ export = function initHtmlPlugin(modules: { typescript: typeof TS }) {
         }
 
         const program = info.languageService.getProgram();
+
+        if (!program) {
+          return diagnostics;
+        }
+
         const source = program?.getSourceFile(filename);
 
-        if (!program || !source) {
+        if (!source) {
           return diagnostics;
         }
 
