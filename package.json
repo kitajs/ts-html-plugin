@@ -1,0 +1,28 @@
+{
+  "name": "@kitajs/ts-html-plugin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Typescript LSP extension to catch XSS vulnerabilities.",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "format": "prettier --write .",
+    "prepack": "npm run build",
+    "test": "tsc --noEmit"
+  },
+  "dependencies": {
+    "tslib": "^2.6.2"
+  },
+  "devDependencies": {
+    "@arthurfiorette/prettier-config": "^1.0.9",
+    "prettier": "^3.0.3",
+    "self": "file:."
+  },
+  "peerDependencies": {
+    "@kitajs/html": ">=2",
+    "typescript": ">=5"
+  },
+  "packageManager": "pnpm@8.7.5"
+}
