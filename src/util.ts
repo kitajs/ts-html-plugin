@@ -25,7 +25,7 @@ export function diagnoseJsxElement(
 ): ts.Diagnostic[] {
   const file = node.getSourceFile();
 
-  const safeAttribute = getSafeAttribute(node.openingElement); 
+  const safeAttribute = getSafeAttribute(node.openingElement);
 
   // Safe mode warnings
   if (safeAttribute) {

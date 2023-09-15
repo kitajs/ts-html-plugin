@@ -8,7 +8,7 @@ const unsafeNumber = 1227;
 const object = {};
 
 export const valid = (
-  <div>
+  <>
     <div></div>
     <div>{date.getTime()}</div>
     <div safe>{date.toISOString()}</div>
@@ -56,7 +56,7 @@ export const invalid = (
     <div>{[1, 2, 3].map((i) => i)}</div>
     <div>{['a', 'b', 'c'].map((i) => i)}</div>
     <div>{[1, 2, 3].map((safeI) => safeI)}</div>
-    <div>{['a', 'b', 'c'].map((isafeI) => safeI)}</div>
+    <div>{['a', 'b', 'c'].map((safeI) => safeI)}</div>
     <div safe>
       <div>{number}</div>
     </div>
@@ -65,7 +65,9 @@ export const invalid = (
 
 export const unnecessary = (
   <>
-    <div safe>{number} {safeString}</div>
+    <div safe>
+      {number} {safeString}
+    </div>
     <div safe>{safeString}</div>
     <div safe> </div>
     <div safe></div>
