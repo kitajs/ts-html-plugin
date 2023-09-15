@@ -1,9 +1,11 @@
-import tss from 'typescript/lib/tsserverlibrary';
+import type { default as TS, server } from 'typescript/lib/tsserverlibrary';
 import { proxyObject, recursiveDiagnoseJsxElements } from './util';
 
-export = function initHtmlPlugin({ typescript: ts }: { typescript: typeof tss }) {
+export = function initHtmlPlugin(modules: { typescript: typeof TS }) {
+  const ts = modules.typescript;
+
   return {
-    create(info: tss.server.PluginCreateInfo) {
+    create(info: server.PluginCreateInfo) {
       const proxy = proxyObject(info.languageService);
 
       proxy.getSemanticDiagnostics = function clonedSemanticDiagnostics(filename) {
@@ -24,7 +26,7 @@ export = function initHtmlPlugin({ typescript: ts }: { typescript: typeof tss })
         const typeChecker = program.getTypeChecker();
 
         ts.forEachChild(source, function loopSourceNodes(node) {
-          recursiveDiagnoseJsxElements(node, typeChecker, diagnostics);
+          recursiveDiagnoseJsxElements(ts, node, typeChecker, diagnostics);
         });
 
         return diagnostics;

@@ -1,10 +1,19 @@
-import ts from 'typescript/lib/tsserverlibrary';
+import type {
+  Diagnostic,
+  JsxElement,
+  JsxOpeningElement,
+  Node,
+  default as TS,
+  Type,
+  TypeChecker
+} from 'typescript/lib/tsserverlibrary';
 import * as Errors from './errors';
 
 export function recursiveDiagnoseJsxElements(
-  node: ts.Node,
-  typeChecker: ts.TypeChecker,
-  original: ts.Diagnostic[]
+  ts: typeof TS,
+  node: Node,
+  typeChecker: TypeChecker,
+  original: Diagnostic[]
 ) {
   ts.forEachChild(node, function loopSourceNodes(node) {
     // Recurse through children first
@@ -13,15 +22,16 @@ export function recursiveDiagnoseJsxElements(
     // Adds children to the array
     if (ts.isJsxElement(node)) {
       // Diagnose the node
-      diagnoseJsxElement(node, typeChecker, original);
+      diagnoseJsxElement(ts, node, typeChecker, original);
     }
   });
 }
 
 export function diagnoseJsxElement(
-  node: ts.JsxElement,
-  typeChecker: ts.TypeChecker,
-  diagnostics: ts.Diagnostic[]
+  ts: typeof TS,
+  node: JsxElement,
+  typeChecker: TypeChecker,
+  diagnostics: Diagnostic[]
 ): void {
   const file = node.getSourceFile();
 
@@ -68,6 +78,7 @@ export function diagnoseJsxElement(
         exp.expression &&
         // is expression safe
         isSafeAttribute(
+          ts,
           typeChecker.getTypeAtLocation(exp.expression!),
           exp.expression!
         ) &&
@@ -106,7 +117,7 @@ export function diagnoseJsxElement(
     const type = typeChecker.getTypeAtLocation(exp.expression);
 
     // Safe can be ignored
-    if (isSafeAttribute(type, exp.expression)) {
+    if (isSafeAttribute(ts, type, exp.expression)) {
       continue;
     }
 
@@ -143,7 +154,7 @@ export function diagnoseJsxElement(
   return;
 }
 
-export function isSafeAttribute(type: ts.Type, expression: ts.Node) {
+export function isSafeAttribute(ts: typeof TS, type: Type, expression: Node) {
   // We allow literal string types here, as if they have XSS content,
   // the user has explicitly written it
   if (
@@ -163,7 +174,7 @@ export function isSafeAttribute(type: ts.Type, expression: ts.Node) {
   return false;
 }
 
-export function getSafeAttribute(element: ts.JsxOpeningElement) {
+export function getSafeAttribute(element: JsxOpeningElement) {
   for (const attribute of element.attributes.properties) {
     if (attribute.getText() === 'safe') {
       return attribute;
