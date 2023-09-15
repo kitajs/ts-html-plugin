@@ -22,7 +22,7 @@ export function diagnoseJsxElement(
   node: ts.JsxElement,
   typeChecker: ts.TypeChecker,
   diagnostics: ts.Diagnostic[]
-): ts.Diagnostic[] {
+): void {
   const file = node.getSourceFile();
 
   const safeAttribute = getSafeAttribute(node.openingElement);
@@ -44,7 +44,7 @@ export function diagnoseJsxElement(
         start: safeAttribute.pos + 1
       });
 
-      return diagnostics;
+      return;
     }
 
     for (const exp of node.children) {
@@ -88,6 +88,8 @@ export function diagnoseJsxElement(
         continue;
       }
     }
+
+    return;
   }
 
   // Look for expressions
@@ -138,7 +140,7 @@ export function diagnoseJsxElement(
     });
   }
 
-  return diagnostics;
+  return;
 }
 
 export function isSafeAttribute(type: ts.Type, expression: ts.Node) {

@@ -15,6 +15,7 @@ export const valid = (
     <div>{safeString}</div>
     <div safe>{html}</div>
     <div>{number}</div>
+    <div safe>hello {html}</div>
     <div safe>{unsafeNumber}</div>
     <div safe>
       {['a', 'b', 'c'].map((i) => (
@@ -40,6 +41,7 @@ export const invalid = (
   <>
     <div>{html}</div>
     <div>{object}</div>
+    
     <div>
       {['a', 'b', 'c'].map((i) => (
         <>{i}</>
