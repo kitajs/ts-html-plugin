@@ -26,7 +26,7 @@
     "self": "file:."
   },
   "peerDependencies": {
-    "@kitajs/ts-html-plugin": ">=2",
+    "@kitajs/html": ">=2",
     "typescript": ">=5"
   },
   "packageManager": "pnpm@8.7.5"
