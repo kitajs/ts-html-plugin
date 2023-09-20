@@ -34,6 +34,7 @@
 - [Installing](#installing)
 - [Getting Started](#getting-started)
 - [JSX](#jsx)
+- [Vscode](#vscode)
 
 <br />
 
@@ -69,5 +70,18 @@ manager, and put this inside your `tsconfig.json`.
 
 For JSX support, please go to [kitajs/html](https://github.com/kitajs/html) for more
 information.
+
+## Vscode
+
+If you are using vscode and this plugin is not working properly, make sure to use the
+current project's typescript version.
+
+```jsonc
+// .vscode/settings.json
+
+{
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
+```
 
 <br />

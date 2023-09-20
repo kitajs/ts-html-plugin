@@ -9,6 +9,9 @@ import type {
 } from 'typescript/lib/tsserverlibrary';
 import * as Errors from './errors';
 
+const UPPERCASE = /[A-Z]/;
+const ESCAPE_HTML_REGEX = /^(\w+\.)?escapeHtml/i;
+
 export function recursiveDiagnoseJsxElements(
   ts: typeof TS,
   node: Node,
@@ -58,8 +61,12 @@ export function diagnoseJsxElement(
     }
 
     for (const exp of node.children) {
-      // JSX Element inside safe
-      if (ts.isJsxElement(exp)) {
+      if (
+        // JSX Element inside safe
+        ts.isJsxElement(exp) ||
+        // Element is using safe with escapeHtml
+        (ts.isJsxExpression(exp) && exp.expression?.getText().match(ESCAPE_HTML_REGEX))
+      ) {
         diagnostics.push({
           category: ts.DiagnosticCategory.Error,
           code: Errors.DoubleEscape.code,
@@ -68,6 +75,7 @@ export function diagnoseJsxElement(
           messageText: Errors.DoubleEscape.message,
           start: exp.pos
         });
+
         continue;
       }
 
@@ -141,12 +149,17 @@ export function diagnoseJsxElement(
       }
     }
 
+    // Switch between component and element xss errors
+    const error = node.openingElement.tagName.getText().match(UPPERCASE)
+      ? Errors.ComponentXss
+      : Errors.Xss;
+
     diagnostics.push({
       category: ts.DiagnosticCategory.Error,
-      code: Errors.Xss.code,
+      code: error.code,
       file,
       length: exp.end - exp.pos,
-      messageText: Errors.Xss.message,
+      messageText: error.message,
       start: exp.pos
     });
   }
@@ -166,8 +179,14 @@ export function isSafeAttribute(ts: typeof TS, type: Type, expression: Node) {
     return true;
   }
 
-  // Variables starting with safe are suppressed
-  if (expression.getText().startsWith('safe')) {
+  const text = expression.getText();
+
+  if (
+    // Variables starting with safe are suppressed
+    text.startsWith('safe') ||
+    // Starts with a call to a escapeHtml function name
+    text.match(ESCAPE_HTML_REGEX)
+  ) {
     return true;
   }
 

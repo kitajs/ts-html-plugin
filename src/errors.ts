@@ -15,3 +15,9 @@ export const UnusedSafe = {
   message:
     'You are using the safe attribute on expressions that does not contain any XSS vulnerabilities. Please remove the safe attribute or prepend your variable with `unsafe`.'
 };
+
+export const ComponentXss = {
+  code: 27061977,
+  message:
+    'You are using a xss-prone element as a children of a component. Please wrap it into a Html.escapeHtml() call or prepend it as a variable starting with `safe`.'
+};

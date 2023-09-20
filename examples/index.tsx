@@ -1,3 +1,4 @@
+import Html from '@kitajs/html';
 import '@kitajs/html/register';
 
 const date = new Date();
@@ -6,6 +7,10 @@ const html = <div>Hello</div>;
 const number = 1227;
 const unsafeNumber = 1227;
 const object = {};
+
+function Component(props: Html.PropsWithChildren) {
+  return <div>{props.children}</div>;
+}
 
 export const valid = (
   <>
@@ -21,11 +26,25 @@ export const valid = (
       {['a', 'b', 'c'].map((i) => (
         <>{i}</>
       ))}
+    </div>
+    <div>
       {['a', 'b', 'c'].map((i) => (
         <div safe>{i}</div>
       ))}
+    </div>{' '}
+    <div>
       {[1, 2, 3].map((i) => (
         <div>{i}</div>
+      ))}
+    </div>
+    <div>
+      {[1, 2, 3].map((i) => (
+        <Component>{i}</Component>
+      ))}
+    </div>
+    <div>
+      {['a', 'b', 'c'].map((i) => (
+        <Component>{Html.escapeHtml(i)}</Component>
       ))}
     </div>
     <div safe>{[1, 2, 3].map((i) => i)}</div>
@@ -34,14 +53,19 @@ export const valid = (
       {'literal'}
       {1}
     </div>
+    <div>{Html.escapeHtml(html)}</div>
+    <div>{Html.escapeHtml(object)}</div>
+    <div>
+      <Component>{Html.escapeHtml(object)}</Component>
+      asd
+    </div>
   </>
 );
 
 export const invalid = (
-  <>
+  <div>
     <div>{html}</div>
     <div>{object}</div>
-    
     <div>
       {['a', 'b', 'c'].map((i) => (
         <>{i}</>
@@ -53,6 +77,11 @@ export const invalid = (
     <div>
       {[1, 2, 3].map((i) => (
         <>{i}</>
+      ))}
+    </div>
+    <div>
+      {['a', 'b', 'c'].map((i) => (
+        <Component>{i}</Component>
       ))}
     </div>
     <div>{[1, 2, 3].map((i) => i)}</div>
@@ -62,7 +91,12 @@ export const invalid = (
     <div safe>
       <div>{number}</div>
     </div>
-  </>
+    <div safe>
+      <Component>{Html.escapeHtml(object)}</Component>
+      asd
+    </div>
+    <div safe>{Html.escapeHtml(object)}</div>
+  </div>
 );
 
 export const unnecessary = (
