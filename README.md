@@ -57,7 +57,7 @@ npm install @kitajs/ts-html-plugin
 
 ## Preview
 
-<img align="center" src="assets/ts-html-plugin.png" alt="Example of an error thrown by this LSP plugin." />
+<img align="center" src="assets/preview.png" alt="Example of an error thrown by this LSP plugin." />
 
 <br />
 
