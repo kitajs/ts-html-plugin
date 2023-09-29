@@ -38,6 +38,7 @@
 <br />
 
 - [Installing](#installing)
+- [Preview](#preview)
 - [Getting Started](#getting-started)
 - [Running as CLI](#running-as-cli)
 - [Vscode](#vscode)
@@ -51,6 +52,12 @@
 ```sh
 npm install @kitajs/ts-html-plugin
 ```
+
+<br />
+
+## Preview
+
+<img align="center" src="assets/ts-html-plugin.png" alt="Example of an error thrown by this LSP plugin." />
 
 <br />
 
