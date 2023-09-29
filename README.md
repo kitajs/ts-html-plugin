@@ -128,6 +128,6 @@ current project's typescript version.
 ## JSX
 
 For JSX support, please go to
-[kitajs/ts-html-plugin](https://github.com/kitajs/ts-html-plugin) for more information.
+[kitajs/html](https://github.com/kitajs/html) for more information.
 
 <br />
