@@ -72,6 +72,8 @@ favorite package manager, and put this inside your `tsconfig.json`.
 }
 ```
 
+[Make sure to understand what language service plugins can and cannot do.](https://github.com/microsoft/TypeScript/wiki/Writing-a-Language-Service-Plugin#whats-a-language-service-plugin)
+
 <br />
 
 ## Running as CLI
@@ -127,7 +129,7 @@ current project's typescript version.
 
 ## JSX
 
-For JSX support, please go to
-[kitajs/html](https://github.com/kitajs/html) for more information.
+For JSX support, please go to [kitajs/html](https://github.com/kitajs/html) for more
+information.
 
 <br />
