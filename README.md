@@ -84,7 +84,7 @@ npm install -g @kitajs/ts-html-plugin
 ```
 
 ```sh
-ts-html-plugin v1.1.0 - A CLI tool & TypeScript LSP for finding XSS vulnerabilities in your TypeScript code.
+ts-html-plugin v1.1.1 - A CLI tool & TypeScript LSP for finding XSS vulnerabilities in your TypeScript code.
 
 Usage: xss-scan         [options]
        ts-html-plugin   [options]
