@@ -128,9 +128,9 @@ Sometimes, the plugin may not detect that a string or variable is safe for use a
 emit warnings, even when you are confident there are no security issues. Here are ways to
 address this:
 
-1. **Keep using use the `safe` Attribute:** Even if you are certain that the content is free from XSS
-   vulnerabilities, you can still use the `safe` attribute for added assurance. After all,
-   what's the problem of being safe twice?
+1. **Keep using use the `safe` Attribute:** Even if you are certain that the content is
+   free from XSS vulnerabilities, you can still use the `safe` attribute for added
+   assurance. After all, what's the problem of being safe twice?
 
    ```tsx
    let html = <div safe>{content}</div>;

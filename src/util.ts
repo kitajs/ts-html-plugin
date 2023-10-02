@@ -167,7 +167,27 @@ export function diagnoseJsxElement(
   return;
 }
 
-export function isSafeAttribute(ts: typeof TS, type: Type, expression: Node) {
+export function isSafeAttribute(ts: typeof TS, type: Type, expression: Node): boolean {
+  // Union types should be checked recursively
+  if (type.isUnion()) {
+    // Children itself renders a ts(27061977) error elsewhere if needed.
+    if (
+      (ts.isPropertyAccessExpression(expression) &&
+        expression.name.getText().trim() === 'children') ||
+      (ts.isElementAccessExpression(expression) &&
+        // indexed['access'] can only be sure its children when the indexing
+        // is made by a string literal
+        ts.isStringLiteral(expression.argumentExpression) &&
+        expression.argumentExpression.text === 'children') ||
+      // destructured children
+      (ts.isIdentifier(expression) && expression.getText().trim() === 'children')
+    ) {
+      return true;
+    }
+
+    return (type as TS.UnionType).types.every((t) => isSafeAttribute(ts, t, expression));
+  }
+
   // We allow literal string types here, as if they have XSS content,
   // the user has explicitly written it
   if (

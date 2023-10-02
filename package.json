@@ -16,6 +16,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "debug": "tsc -p tsconfig.build.json; xss-scan examples/debug.tsx",
     "dev": "tsc -p tsconfig.build.json --watch",
     "format": "prettier --write .",
     "prepack": "npm run build",

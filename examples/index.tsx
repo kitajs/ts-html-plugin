@@ -7,6 +7,7 @@ const html = <div>Hello</div>;
 const number = 1227;
 const unsafeNumber = 1227;
 const object = {};
+const union = 1 as string | number;
 
 function Component(props: Html.PropsWithChildren) {
   return <div>{props.children}</div>;
@@ -22,6 +23,7 @@ export const valid = (
     <div>{number}</div>
     <div safe>hello {html}</div>
     <div safe>{unsafeNumber}</div>
+    <div safe>{union}</div>
     <div safe>
       {['a', 'b', 'c'].map((i) => (
         <>{i}</>
@@ -109,3 +111,7 @@ export const unnecessary = (
     <div safe></div>
   </>
 );
+
+let a: string | number = 1;
+
+let b = <div>{a}</div>;
