@@ -111,7 +111,3 @@ export const unnecessary = (
     <div safe></div>
   </>
 );
-
-let a: string | number = 1;
-
-let b = <div>{a}</div>;
