@@ -41,6 +41,7 @@
 - [Preview](#preview)
 - [Getting Started](#getting-started)
 - [Running as CLI](#running-as-cli)
+- [Handling Warnings](#handling-warnings)
 - [Vscode](#vscode)
 - [JSX](#jsx)
 
@@ -93,6 +94,8 @@ npm install -g @kitajs/ts-html-plugin
 ```
 
 ```sh
+$ xss-scan --help
+
 ts-html-plugin v1.1.1 - A CLI tool & TypeScript LSP for finding XSS vulnerabilities in your TypeScript code.
 
 Usage: xss-scan         [options]
@@ -116,6 +119,37 @@ Exit codes:
   1 - XSS vulnerabilities were found
   2 - Only XSS warnings were found
 ```
+
+<br />
+
+## Handling Warnings
+
+Sometimes, the plugin may not detect that a string or variable is safe for use and may
+emit warnings, even when you are confident there are no security issues. Here are ways to
+address this:
+
+1. **Keep using use the `safe` Attribute:** Even if you are certain that the content is free from XSS
+   vulnerabilities, you can still use the `safe` attribute for added assurance. After all,
+   what's the problem of being safe twice?
+
+   ```tsx
+   let html = <div safe>{content}</div>;
+   ```
+
+2. **Prepend the Variable with `safe`:** Indicate to the plugin that you are confident the
+   variable is safe to use by adding `safe` before it.
+
+   ```tsx
+   let safeContent = '';
+   let html = <div>{safeContent}</div>;
+   ```
+
+3. **Cast to `'safe'`:** When using raw values or function calls without saving them into
+   a variable, you can append `as 'safe'` to the expression to inform the plugin.
+
+   ```tsx
+   let html = <div>{content as 'safe'}</div>;
+   ```
 
 <br />
 
