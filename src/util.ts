@@ -1,3 +1,4 @@
+import { JsxFragment } from 'typescript';
 import type {
   Diagnostic,
   JsxElement,
@@ -12,6 +13,15 @@ import * as Errors from './errors';
 const UPPERCASE = /[A-Z]/;
 const ESCAPE_HTML_REGEX = /^(\w+\.)?escapeHtml/i;
 
+/**
+ * If the node is a JSX element or fragment
+ */
+export function isJsx(ts: typeof TS, node: TS.Node): node is JsxElement | JsxFragment {
+  return (
+    node.kind === ts.SyntaxKind.JsxElement || node.kind === ts.SyntaxKind.JsxFragment
+  );
+}
+
 export function recursiveDiagnoseJsxElements(
   ts: typeof TS,
   node: Node,
@@ -23,7 +33,7 @@ export function recursiveDiagnoseJsxElements(
     ts.forEachChild(node, loopSourceNodes);
 
     // Adds children to the array
-    if (ts.isJsxElement(node)) {
+    if (isJsx(ts, node)) {
       // Diagnose the node
       diagnoseJsxElement(ts, node, typeChecker, original);
     }
@@ -32,13 +42,13 @@ export function recursiveDiagnoseJsxElements(
 
 export function diagnoseJsxElement(
   ts: typeof TS,
-  node: JsxElement,
+  node: JsxElement | JsxFragment,
   typeChecker: TypeChecker,
   diagnostics: Diagnostic[]
 ): void {
   const file = node.getSourceFile();
 
-  const safeAttribute = getSafeAttribute(node.openingElement);
+  const safeAttribute = ts.isJsxElement(node) && getSafeAttribute(node.openingElement);
 
   // Safe mode warnings
   if (safeAttribute) {
@@ -88,7 +98,8 @@ export function diagnoseJsxElement(
         isSafeAttribute(
           ts,
           typeChecker.getTypeAtLocation(exp.expression!),
-          exp.expression!
+          exp.expression!,
+          typeChecker
         ) &&
         // does not starts with unsafe
         !exp.expression.getText().startsWith('unsafe') &&
@@ -125,7 +136,7 @@ export function diagnoseJsxElement(
     const type = typeChecker.getTypeAtLocation(exp.expression);
 
     // Safe can be ignored
-    if (isSafeAttribute(ts, type, exp.expression)) {
+    if (isSafeAttribute(ts, type, exp.expression, typeChecker)) {
       continue;
     }
 
@@ -135,7 +146,7 @@ export function diagnoseJsxElement(
 
       ts.forEachChild(exp.expression, function loopSourceNodes(node) {
         // Check first to early exit
-        if (ts.isJsxElement(node)) {
+        if (isJsx(ts, node)) {
           hasInnerJsx = true;
           return;
         }
@@ -150,9 +161,10 @@ export function diagnoseJsxElement(
     }
 
     // Switch between component and element xss errors
-    const error = node.openingElement.tagName.getText().match(UPPERCASE)
-      ? Errors.ComponentXss
-      : Errors.Xss;
+    const error =
+      ts.isJsxFragment(node) || node.openingElement.tagName.getText().match(UPPERCASE)
+        ? Errors.ComponentXss
+        : Errors.Xss;
 
     diagnostics.push({
       category: ts.DiagnosticCategory.Error,
@@ -167,25 +179,59 @@ export function diagnoseJsxElement(
   return;
 }
 
-export function isSafeAttribute(ts: typeof TS, type: Type, expression: Node): boolean {
-  // Union types should be checked recursively
-  if (type.isUnion()) {
-    // Children itself renders a ts(27061977) error elsewhere if needed.
+export function isSafeAttribute(
+  ts: typeof TS,
+  type: Type | undefined,
+  expression: Node,
+  checker: TypeChecker
+): boolean {
+  // Nothing to do if type cannot be resolved
+  if (!type) {
+    return true;
+  }
+
+  // Any type is never safe
+  if (type.flags & ts.TypeFlags.Any) {
+    return false;
+  }
+
+  if (type.aliasSymbol) {
+    // Allows JSX.Element
     if (
-      (ts.isPropertyAccessExpression(expression) &&
-        expression.name.getText().trim() === 'children') ||
-      (ts.isElementAccessExpression(expression) &&
-        // indexed['access'] can only be sure its children when the indexing
-        // is made by a string literal
-        ts.isStringLiteral(expression.argumentExpression) &&
-        expression.argumentExpression.text === 'children') ||
-      // destructured children
-      (ts.isIdentifier(expression) && expression.getText().trim() === 'children')
+      type.aliasSymbol.escapedName === 'Element' &&
+      // @ts-expect-error - Fast way of checking
+      type.aliasSymbol.parent?.escapedName === 'JSX' &&
+      // Only allows in .map() or other method calls
+      ts.isCallExpression(expression)
     ) {
       return true;
     }
 
-    return (type as TS.UnionType).types.every((t) => isSafeAttribute(ts, t, expression));
+    // Allows Html.Children
+    if (
+      type.aliasSymbol.escapedName === 'Children' &&
+      // @ts-expect-error - Fast way of checking
+      type.aliasSymbol.parent?.escapedName === 'Html'
+    ) {
+      return true;
+    }
+  }
+
+  // Union types should be checked recursively
+  if (type.isUnion()) {
+    return (type as TS.UnionType).types.every((t) =>
+      isSafeAttribute(ts, t, expression, checker)
+    );
+  }
+
+  // For Array or Promise, we check the type of the first generic
+  if (checker.isArrayType(type) || type.symbol?.escapedName === 'Promise') {
+    return isSafeAttribute(
+      ts,
+      (type as any).resolvedTypeArguments?.[0],
+      expression,
+      checker
+    );
   }
 
   // We allow literal string types here, as if they have XSS content,
