@@ -1,6 +1,6 @@
 {
   "name": "@kitajs/ts-html-plugin",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Typescript LSP extension to catch XSS vulnerabilities.",
   "bugs": "https://github.com/kitajs/ts-html-plugin/issues",
   "repository": "https://github.com/kitajs/ts-html-plugin",
