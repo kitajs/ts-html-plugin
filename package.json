@@ -35,7 +35,7 @@
     "self": "file:."
   },
   "peerDependencies": {
-    "@kitajs/html": ">=2",
+    "@kitajs/html": ">=3",
     "typescript": ">=5"
   },
   "packageManager": "pnpm@8.7.5"

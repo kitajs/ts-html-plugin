@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@kitajs/html':
-    specifier: '>=2'
-    version: 2.2.2
+    specifier: '>=3'
+    version: 3.0.0(@kitajs/ts-html-plugin@1.1.1)
   chalk:
     specifier: ^4.1.2
     version: 4.1.2
@@ -36,7 +36,7 @@ devDependencies:
     version: 3.0.3
   self:
     specifier: file:.
-    version: file:(@kitajs/html@2.2.2)(typescript@5.2.2)
+    version: file:(@kitajs/html@3.0.0)(typescript@5.2.2)
 
 packages:
 
@@ -56,11 +56,27 @@ packages:
       - supports-color
     dev: true
 
-  /@kitajs/html@2.2.2:
-    resolution: {integrity: sha512-NSTExqcjRUZ1kfnw487hTR+6OxQ53qvXNxVCk7W06+SKMALFptDxPMF5Ga5q0+jt/evUiBRpG7usCSU5lrFHiw==}
+  /@kitajs/html@3.0.0(@kitajs/ts-html-plugin@1.1.1):
+    resolution: {integrity: sha512-8k9TH+9IBjq4XE/ct7Bv/jpKGuPqsTEbS8XFk4fQRNzQPRjJUm2sgQad9kIAZqh5UPA/QWw1pYMTI32UwKPRWg==}
     engines: {node: '>=12'}
+    peerDependencies:
+      '@kitajs/ts-html-plugin': '>=1.1'
     dependencies:
+      '@kitajs/ts-html-plugin': 1.1.1(@kitajs/html@3.0.0)(typescript@5.2.2)
       csstype: 3.1.2
+
+  /@kitajs/ts-html-plugin@1.1.1(@kitajs/html@3.0.0)(typescript@5.2.2):
+    resolution: {integrity: sha512-LV/6b23stMYoIg3lJBMgEhn10bvU75kdwTrE0pnLjfn64CJdvCNmpiDtnGWd9TIzoBaRAPCh5nPFxXJg6pm4Eg==}
+    hasBin: true
+    peerDependencies:
+      '@kitajs/html': '>=2'
+      typescript: '>=5'
+    dependencies:
+      '@kitajs/html': 3.0.0(@kitajs/ts-html-plugin@1.1.1)
+      chalk: 4.1.2
+      tslib: 2.6.2
+      typescript: 5.2.2
+      yargs: 17.7.2
 
   /@nodelib/fs.scandir@2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -1012,16 +1028,16 @@ packages:
       y18n: 5.0.8
       yargs-parser: 21.1.1
 
-  file:(@kitajs/html@2.2.2)(typescript@5.2.2):
+  file:(@kitajs/html@3.0.0)(typescript@5.2.2):
     resolution: {directory: '', type: directory}
     id: 'file:'
     name: '@kitajs/ts-html-plugin'
     hasBin: true
     peerDependencies:
-      '@kitajs/html': '>=2'
+      '@kitajs/html': '>=3'
       typescript: '>=5'
     dependencies:
-      '@kitajs/html': 2.2.2
+      '@kitajs/html': 3.0.0(@kitajs/ts-html-plugin@1.1.1)
       chalk: 4.1.2
       tslib: 2.6.2
       typescript: 5.2.2
