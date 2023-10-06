@@ -2,6 +2,7 @@
 
 import chalk from 'chalk';
 import fs from 'fs';
+import { EOL } from 'os';
 import path from 'path';
 import ts from 'typescript';
 import yargs from 'yargs';
@@ -56,48 +57,6 @@ function readCompilerOptions(tsconfigPath: string) {
   }
 
   return { options, fileNames, errors: undefined };
-}
-
-function prettyPrintDiagnostics(diagnostics: ts.Diagnostic[], root: string) {
-  // Prints an error message in the same way as tsc does
-
-  for (const diagnostic of diagnostics) {
-    const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-
-    if (!diagnostic.file) {
-      console.error(diagnostic);
-      continue;
-    }
-
-    const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
-      diagnostic.start!
-    );
-
-    let error = '';
-
-    error += chalk.cyan(path.relative(root, diagnostic.file.fileName));
-    error += ':';
-    error += chalk.yellow(line + 1);
-    error += ':';
-    error += chalk.yellow(character + 1);
-    error += ' - ';
-    error += chalk.red('error');
-    error += ' ';
-    error += chalk.grey(`TS${diagnostic.code}:`);
-    error += ' ';
-    error += message;
-    error += '\n\n';
-    error += chalk.bgWhite.black(line + 1);
-    error += ' ';
-    error += diagnostic.file.text.split('\n')[line];
-    error += '\n';
-    error += chalk.bgWhite.black(' '.repeat((line + 1).toString().length));
-    error += ' '.repeat(character + 1);
-    error += chalk.red('~'.repeat(diagnostic.length!));
-    error += '\n';
-
-    console.error(error);
-  }
 }
 
 function prettyPrintErrorCount(diagnostics: ts.Diagnostic[], root: string) {
@@ -179,8 +138,17 @@ async function main() {
 
   const tsconfig = readCompilerOptions(tsconfigPath);
 
+  const diagnosticHost: ts.FormatDiagnosticsHost = {
+    getCurrentDirectory: () => root,
+    getCanonicalFileName: (fileName) => fileName,
+    getNewLine: () => EOL
+  };
+
   if (tsconfig.errors) {
-    prettyPrintDiagnostics(tsconfig.errors, root);
+    console.error(
+      ts.formatDiagnosticsWithColorAndContext(tsconfig.errors, diagnosticHost)
+    );
+
     return process.exit(1);
   }
 
@@ -207,6 +175,11 @@ async function main() {
     }
   }
 
+  if (!files.length) {
+    console.error(chalk.red(`No files were found to check.`));
+    return process.exit(1);
+  }
+
   const program = ts.createProgram(files, tsconfig.options);
   const typeChecker = program.getTypeChecker();
   const sources = program.getSourceFiles();
@@ -226,18 +199,15 @@ async function main() {
     });
   }
 
-  console.log();
-
   if (diagnostics.length) {
-    const exitCode = diagnostics.some(
+    const hasError = diagnostics.some(
       (diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error
-    )
-      ? 1
-      : 2;
+    );
 
-    prettyPrintDiagnostics(diagnostics, root);
+    console.error(ts.formatDiagnosticsWithColorAndContext(diagnostics, diagnosticHost));
     prettyPrintErrorCount(diagnostics, root);
-    process.exit(exitCode);
+
+    process.exit(hasError ? 1 : 2);
   }
 
   console.log(chalk.green(`No XSS vulnerabilities found in ${files.length} files!`));
