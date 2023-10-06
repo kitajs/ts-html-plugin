@@ -96,22 +96,23 @@ npm install -g @kitajs/ts-html-plugin
 ```sh
 $ xss-scan --help
 
-ts-html-plugin v1.1.1 - A CLI tool & TypeScript LSP for finding XSS vulnerabilities in your TypeScript code.
+ts-html-plugin v1.1.2 - A CLI tool & TypeScript LSP for finding XSS vulnerabilities in your TypeScript code.
 
-Usage: xss-scan         [options]
-       ts-html-plugin   [options]
+Usage: xss-scan         [options] <file> <file>...
+       ts-html-plugin   [options] <file> <file>...
 
 Options:
-  --cwd <path>      The current working directory to use (defaults to process.cwd())
-  --project <path>  The path to the tsconfig.json file to use (defaults to 'tsconfig.json')
-  --help            Show this help message
-  --version         Show the version number
-  <file> <file>...  The files to check (defaults to all files in tsconfig.json)
+  --cwd <path>          The current working directory to use (defaults to process.cwd())
+  -p, --project <path>  The path to the tsconfig.json file to use (defaults to 'tsconfig.json')
+  -s, --simplified      Use simplified diagnostics
+  -h, --help            Show this help message
+  --version             Show the version number
+  <file> <file>...      The files to check (defaults to all files in tsconfig.json)
 
 Examples:
   $ xss-scan
-  $ xss-scan --cwd src
-  $ xss-scan --project tsconfig.build.json
+  $ xss-scan --cwd src --project tsconfig.build.json
+  $ xss-scan -s -- src/component.tsx
   $ xss-scan src/index.tsx src/App.tsx
 
 Exit codes:

@@ -21,6 +21,7 @@ Usage: xss-scan         [options] <file> <file>...
 Options:
   --cwd <path>          The current working directory to use (defaults to process.cwd())
   -p, --project <path>  The path to the tsconfig.json file to use (defaults to 'tsconfig.json')
+  -s, --simplified      Use simplified diagnostics
   -h, --help            Show this help message
   --version             Show the version number
   <file> <file>...      The files to check (defaults to all files in tsconfig.json)
@@ -35,6 +36,7 @@ Exit codes:
   0 - No XSS vulnerabilities were found
   1 - XSS vulnerabilities were found
   2 - Only XSS warnings were found
+
 `.trim();
 
 function readCompilerOptions(tsconfigPath: string) {
@@ -120,6 +122,8 @@ async function main() {
       case 'cwd':
       case 'project':
       case 'p':
+      case 's':
+      case 'simplified':
         continue;
       default:
         console.error(`Unknown argument: ${key}. Run --help for more information.`);
@@ -131,8 +135,14 @@ async function main() {
 
   const tsconfigPath = String(args.project || args.p || 'tsconfig.json');
 
+  const simplified = !!(args.simplified || args.s);
+
+  const diagnosticFormatter = simplified
+    ? ts.formatDiagnostics
+    : ts.formatDiagnosticsWithColorAndContext;
+
   if (!fileExists(tsconfigPath)) {
-    console.error(`Could not find ${tsconfigPath}`);
+    console.error((!simplified ? chalk.red : String)(`Could not find ${tsconfigPath}`));
     return process.exit(1);
   }
 
@@ -145,10 +155,7 @@ async function main() {
   };
 
   if (tsconfig.errors) {
-    console.error(
-      ts.formatDiagnosticsWithColorAndContext(tsconfig.errors, diagnosticHost)
-    );
-
+    console.error(diagnosticFormatter(tsconfig.errors, diagnosticHost));
     return process.exit(1);
   }
 
@@ -162,12 +169,18 @@ async function main() {
       let file = String(args._[i]);
 
       if (!fileExists(file)) {
-        console.error(chalk.red(`Could not find provided '${file}' file.`));
+        console.error(
+          (!simplified ? chalk.red : String)(`Could not find provided '${file}' file.`)
+        );
         return process.exit(1);
       }
 
       if (!file.match(/(t|j)sx$/)) {
-        console.warn(chalk.yellow(`Provided '${file}' file is not a TSX/JSX file.`));
+        console.warn(
+          (!simplified ? chalk.yellow : String)(
+            `Provided '${file}' file is not a TSX/JSX file.`
+          )
+        );
         continue;
       }
 
@@ -176,7 +189,7 @@ async function main() {
   }
 
   if (!files.length) {
-    console.error(chalk.red(`No files were found to check.`));
+    console.error((!simplified ? chalk.red : String)(`No files were found to check.`));
     return process.exit(1);
   }
 
@@ -204,8 +217,11 @@ async function main() {
       (diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error
     );
 
-    console.error(ts.formatDiagnosticsWithColorAndContext(diagnostics, diagnosticHost));
-    prettyPrintErrorCount(diagnostics, root);
+    console.error(diagnosticFormatter(diagnostics, diagnosticHost));
+
+    if (!simplified) {
+      prettyPrintErrorCount(diagnostics, root);
+    }
 
     process.exit(hasError ? 1 : 2);
   }
