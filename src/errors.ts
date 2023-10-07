@@ -1,23 +1,22 @@
 export const Xss = {
-  code: 27022005,
+  code: '0 K601' as any,
   message:
-    'Usage of JSX expression without safe attribute. This could lead to XSS vulnerabilities. Please use the safe attribute on the JSX element or prepend your variable with `safe`.'
+    'Usage of xss-prone content without `safe` attribute. https://kitajs.github.io/ts-html-plugin#k601'
 };
 
 export const DoubleEscape = {
-  code: 16061999,
+  code: '0 K602' as any,
   message:
-    'You are using the safe attribute on a JSX element whose children contains other JSX elements. It will lead to double escaping. If this is intended behavior, please extract the children into a separate variable and use that instead.'
-};
-
-export const UnusedSafe = {
-  code: 17091977,
-  message:
-    'You are using the safe attribute on expressions that does not contain any XSS vulnerabilities. Please remove the safe attribute or prepend your variable with `unsafe`.'
+    'Double escaping detected. Please remove the `safe` attribute. https://kitajs.github.io/ts-html-plugin#k602'
 };
 
 export const ComponentXss = {
-  code: 27061977,
+  code: '0 K603' as any,
   message:
-    'You are using a xss-prone element as a children of a component. Please wrap it into a Html.escapeHtml() call or prepend it as a variable starting with `safe`.'
+    'Xss-prone content inside a Component, wrap it into a Html.escapeHtml() call. https://kitajs.github.io/ts-html-plugin#k603'
+};
+
+export const UnusedSafe = {
+  code: '0 K604' as any,
+  message: 'Unused safe attribute. https://kitajs.github.io/ts-html-plugin#k604'
 };

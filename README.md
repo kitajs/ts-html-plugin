@@ -42,9 +42,14 @@
 - [Getting Started](#getting-started)
 - [Running as CLI](#running-as-cli)
 - [Handling Warnings](#handling-warnings)
-- [Special cases](#special-cases)
 - [Vscode](#vscode)
+- [Error codes](#error-codes)
+  - [K601](#k601)
+  - [K602](#k602)
+  - [K603](#k603)
+  - [K604](#k604)
 - [JSX](#jsx)
+- [Special cases](#special-cases)
 
 <br />
 <br />
@@ -155,6 +160,128 @@ address this:
 
 <br />
 
+## Vscode
+
+If you are using vscode and this plugin is not working properly, make sure to use the
+current project's typescript version.
+
+```jsonc
+// .vscode/settings.json
+
+{
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
+```
+
+<br />
+
+## Error codes
+
+### K601
+
+Usage of JSX expression without safe attribute. This could lead to XSS vulnerabilities.
+Please use the safe attribute on the JSX element or prepend your variable with `safe`.
+
+```tsx
+// ❌ Content variable may have a value of `<script>alert('xss')</script>`
+// which will lead to XSS vulnerabilities.
+let html = <div>{content}</div>;
+
+// ✅ Content variable may have a value of `<script>alert('xss')</script>`,
+// but it's safe to use because it will get escaped to =
+// `&lt;script&gt;alert('xss')&lt;/script&gt;`.
+let html = <div safe>{content}</div>;
+
+// ⚠️ Content variable may have a value of `<script>alert('xss')</script>`,
+// but variable starts with safe, so the error is suppressed.
+let safeContent = content;
+let html = <div>{safeContent}</div>;
+```
+
+<br />
+
+### K602
+
+Usage of safe attribute on a JSX element whose children contains other JSX elements. It
+will lead to double escaping. If this is intended behavior, please extract the children
+into a separate variable and use that instead.
+
+```tsx
+// ❌ Safe attribute in the outer element will also escape inner elements.
+// In this // case the <b> tag will also be escaped, resulting into
+// `<a>&lt;b&gt;1&lt;/b&gt;</a>`.
+let html = (
+  <a safe>
+    <b>1</b>
+  </a>
+);
+
+// ✅ Safe attribute in the inner element will escape only the inner element.
+// In this case the <b> tag will be escaped, resulting into
+// `<a><b>1</b></a>`.
+let html = (
+  <a>
+    <b safe>1</b>
+  </a>
+);
+```
+
+<br />
+
+### K603
+
+You are using a xss-prone element as a children of a component. Please wrap it into a
+Html.escapeHtml() call or prepend it as a variable starting with `safe`.
+
+This error is similar to [K601](#k601), but instead of using `safe` native attribute, you
+need to use `Html.escapeHtml()` function because its a component and not a native JSX.
+
+```tsx
+// ❌ Content variable may have a value of `<script>alert('xss')</script>`
+// which will lead to XSS vulnerabilities.
+let html = <Component>{content}</Component>;
+
+// ✅ Content variable may have a value of `<script>alert('xss')</script>`,
+// but it's safe to use because you manually call the escape function.
+let html = <Component>{Html.escapeHtml(content)}</Component>;
+
+// ⚠️ Content variable may have a value of `<script>alert('xss')</script>`,
+// but variable starts with safe, so the error is suppressed.
+let safeContent = content;
+let html = <Component>{safeContent}</Component>;
+```
+
+<br />
+
+### K604
+
+You are using the safe attribute on expressions that does not contain any XSS
+vulnerabilities. Please remove the safe attribute or prepend your variable with `unsafe`.
+
+```tsx
+// ⚠️ The variable will never have any harmful XSS content, so the safe attribute is
+// not needed and can be removed.
+let html = <div safe>{numberVariable}</div>;
+
+// ✅ This variable will never have any harmful XSS content, so we can use it
+// as is.
+let html = <div>{numberVariable}</div>;
+
+// ✅ You manually told this plugin that the variable is unsafe, so errors will
+// be thrown.
+let unsafeVariable = numberVariable;
+let html = <div safe>{unsafeVariable}</div>;
+```
+
+<br />
+
+## JSX
+
+For JSX support, please go to [kitajs/html](https://github.com/kitajs/html) for more
+information.
+
+<br />
+
 ## Special cases
 
 1. Anything inside a `<script>` tag is allowed. If you are using a script tag, you want to
@@ -171,25 +298,5 @@ address this:
    let html = <div>{isSafe ? safeContent : content}</div>;
    //                                      ~~~~~~~
    ```
-
-## Vscode
-
-If you are using vscode and this plugin is not working properly, make sure to use the
-current project's typescript version.
-
-```jsonc
-// .vscode/settings.json
-
-{
-  "typescript.tsdk": "node_modules/typescript/lib"
-}
-```
-
-<br />
-
-## JSX
-
-For JSX support, please go to [kitajs/html](https://github.com/kitajs/html) for more
-information.
 
 <br />
