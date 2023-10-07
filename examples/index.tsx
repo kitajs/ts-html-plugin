@@ -85,7 +85,6 @@ export const invalid = (
         <div>{i}</div>
       ))}
     </div>
-
     <div>
       {['a', 'b', 'c'].map((i) => (
         <Component>{i}</Component>
