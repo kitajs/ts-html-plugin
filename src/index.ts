@@ -12,7 +12,7 @@ export = function initHtmlPlugin(modules: { typescript: typeof TS }) {
         const diagnostics = info.languageService.getSemanticDiagnostics(filename);
 
         // Not a tsx file, so don't do anything
-        if (!filename.match(/(t|j)sx$/)) {
+        if (!filename.endsWith('.tsx') && !filename.endsWith('.jsx')) {
           return diagnostics;
         }
 
