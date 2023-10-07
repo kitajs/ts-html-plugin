@@ -9,8 +9,8 @@ dependencies:
     specifier: '>=3'
     version: 3.0.0(@kitajs/ts-html-plugin@1.1.1)
   chalk:
-    specifier: ^4.1.2
-    version: 4.1.2
+    specifier: ^5.3.0
+    version: 5.3.0
   tslib:
     specifier: ^2.6.2
     version: 2.6.2
@@ -23,14 +23,14 @@ dependencies:
 
 devDependencies:
   '@arthurfiorette/prettier-config':
-    specifier: ^1.0.9
+    specifier: ^1.0.11
     version: 1.0.11(prettier@3.0.3)(typescript@5.2.2)
   '@types/node':
-    specifier: ^20.7.1
-    version: 20.7.1
+    specifier: ^20.8.3
+    version: 20.8.3
   '@types/yargs':
-    specifier: ^17.0.26
-    version: 17.0.26
+    specifier: ^17.0.28
+    version: 17.0.28
   prettier:
     specifier: ^3.0.3
     version: 3.0.3
@@ -128,8 +128,8 @@ packages:
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
     dev: true
 
-  /@types/node@20.7.1:
-    resolution: {integrity: sha512-LT+OIXpp2kj4E2S/p91BMe+VgGX2+lfO+XTpfXhh+bCk2LkQtHZSub8ewFBMGP5ClysPjTDFa4sMI8Q3n4T0wg==}
+  /@types/node@20.8.3:
+    resolution: {integrity: sha512-jxiZQFpb+NlH5kjW49vXxvxTjeeqlbsnTAdBTKpzEdPs9itay7MscYXz3Fo9VYFEsfQ6LJFitHad3faerLAjCw==}
     dev: true
 
   /@types/unist@2.0.8:
@@ -140,8 +140,8 @@ packages:
     resolution: {integrity: sha512-axdPBuLuEJt0c4yI5OZssC19K2Mq1uKdrfZBzuxLvaztgqUtFYZUNw7lETExPYJR9jdEoIg4mb7RQKRQzOkeGQ==}
     dev: true
 
-  /@types/yargs@17.0.26:
-    resolution: {integrity: sha512-Y3vDy2X6zw/ZCumcwLpdhM5L7jmyGpmBCTYMHDLqT2IKVMYRRLdv6ZakA+wxhra6Z/3bwhNbNl9bDGXaFU+6rw==}
+  /@types/yargs@17.0.28:
+    resolution: {integrity: sha512-N3e3fkS86hNhtk6BEnc0rj3zcehaxx8QWhCROJkqpl5Zaoi7nAic3jH8q94jVD3zu5LGk+PUB6KAiDmimYOEQw==}
     dependencies:
       '@types/yargs-parser': 21.0.1
     dev: true
@@ -192,6 +192,10 @@ packages:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
+
+  /chalk@5.3.0:
+    resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
   /character-entities@2.0.2:
     resolution: {integrity: sha512-shx7oQ0Awen/BRIdkjkvz54PnEEI/EjwXDSIZp86/KKdbafHh1Df/RYGBhn4hbe2+uKC9FnT5UCEdyPz3ai9hQ==}
@@ -1032,7 +1036,7 @@ packages:
       typescript: '>=5'
     dependencies:
       '@kitajs/html': 3.0.0(@kitajs/ts-html-plugin@1.1.1)
-      chalk: 4.1.2
+      chalk: 5.3.0
       tslib: 2.6.2
       typescript: 5.2.2
       yargs: 17.7.2
