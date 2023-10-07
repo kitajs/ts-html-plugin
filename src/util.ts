@@ -172,22 +172,21 @@ function diagnoseExpression(
 
   // Anything other than a identifier should be
   if (!ts.isIdentifier(node)) {
-    let jsx;
-
-    // Finds a JSX element
-    ts.forEachChild(node, function loopSourceNodes(child) {
-      if (isJsx(ts, child)) {
-        jsx = child;
-        return;
-      }
-
-      ts.forEachChild(child, loopSourceNodes);
-    });
+    let tags = node.getChildren().filter((c) => isJsx(ts, c));
 
     // If root JSX element found inside array, diagnose it,
     // otherwise let the diagnostic pass
-    if (jsx) {
-      diagnoseJsxElement(ts, jsx, typeChecker, diagnostics);
+    if (tags.length) {
+      for (const tag of tags) {
+        diagnoseJsxElement(
+          ts,
+          tag as JsxElement | ts.JsxFragment,
+          typeChecker,
+          diagnostics
+        );
+      }
+
+      return;
     }
   }
 
