@@ -1,4 +1,4 @@
-import { JsxFragment } from 'typescript';
+import ts, { JsxFragment } from 'typescript';
 import type {
   Diagnostic,
   JsxElement,
@@ -38,6 +38,21 @@ export function recursiveDiagnoseJsxElements(
   });
 }
 
+function diagnostic(
+  node: ts.Node,
+  error: keyof typeof Errors,
+  category: keyof typeof TS.DiagnosticCategory
+): ts.Diagnostic {
+  return {
+    category: ts.DiagnosticCategory[category],
+    messageText: Errors[error].message,
+    code: Errors[error].code,
+    file: node.getSourceFile(),
+    length: node.getWidth(),
+    start: node.getStart()
+  };
+}
+
 export function diagnoseJsxElement(
   ts: typeof TS,
   node: JsxElement | JsxFragment,
@@ -46,6 +61,7 @@ export function diagnoseJsxElement(
 ): void {
   const file = node.getSourceFile();
 
+  // Validations that does not applies to fragments
   if (ts.isJsxElement(node)) {
     // Script tags should be ignored
     if (node.openingElement.tagName.getText() === 'script') {
@@ -62,15 +78,7 @@ export function diagnoseJsxElement(
         // Only text elements
         (node.children.length === 1 && node.children[0]!.kind === ts.SyntaxKind.JsxText)
       ) {
-        diagnostics.push({
-          category: ts.DiagnosticCategory.Warning,
-          code: Errors.UnusedSafe.code,
-          file,
-          length: safeAttribute.end - safeAttribute.pos - 1,
-          messageText: Errors.UnusedSafe.message,
-          start: safeAttribute.pos + 1
-        });
-
+        diagnostics.push(diagnostic(safeAttribute, 'UnusedSafe', 'Warning'));
         return;
       }
 
@@ -81,15 +89,7 @@ export function diagnoseJsxElement(
           // Element is using safe with escapeHtml
           (ts.isJsxExpression(exp) && exp.expression?.getText().match(ESCAPE_HTML_REGEX))
         ) {
-          diagnostics.push({
-            category: ts.DiagnosticCategory.Error,
-            code: Errors.DoubleEscape.code,
-            file,
-            length: exp.end - exp.pos,
-            messageText: Errors.DoubleEscape.message,
-            start: exp.pos
-          });
-
+          diagnostics.push(diagnostic(exp, 'DoubleEscape', 'Error'));
           continue;
         }
 
@@ -110,15 +110,7 @@ export function diagnoseJsxElement(
           // Avoids double warnings
           !diagnostics.some((d) => d.start === safeAttribute.pos + 1 && d.file === file)
         ) {
-          diagnostics.push({
-            category: ts.DiagnosticCategory.Warning,
-            code: Errors.UnusedSafe.code,
-            file,
-            length: safeAttribute.end - safeAttribute.pos - 1,
-            messageText: Errors.UnusedSafe.message,
-            start: safeAttribute.pos + 1
-          });
-
+          diagnostics.push(diagnostic(safeAttribute, 'UnusedSafe', 'Warning'));
           continue;
         }
       }
@@ -138,50 +130,74 @@ export function diagnoseJsxElement(
       continue;
     }
 
-    const type = typeChecker.getTypeAtLocation(exp.expression);
-
-    // Safe can be ignored
-    if (isSafeAttribute(ts, type, exp.expression, typeChecker)) {
-      continue;
-    }
-
-    // Arrays should be handled by the recursive function
-    if (typeChecker.isArrayLikeType(type)) {
-      let hasInnerJsx = false;
-
-      ts.forEachChild(exp.expression, function loopSourceNodes(node) {
-        // Check first to early exit
-        if (isJsx(ts, node)) {
-          hasInnerJsx = true;
-          return;
-        }
-
-        ts.forEachChild(node, loopSourceNodes);
-      });
-
-      // Skips diagnostics if there is an inner JSX element
-      if (hasInnerJsx) {
-        continue;
-      }
-    }
-
-    // Switch between component and element xss errors
-    const error =
-      ts.isJsxFragment(node) || node.openingElement.tagName.getText().match(UPPERCASE)
-        ? Errors.ComponentXss
-        : Errors.Xss;
-
-    diagnostics.push({
-      category: ts.DiagnosticCategory.Error,
-      code: error.code,
-      file,
-      length: exp.end - exp.pos,
-      messageText: error.message,
-      start: exp.pos
-    });
+    diagnoseNode(
+      ts,
+      exp.expression,
+      typeChecker,
+      diagnostics,
+      ts.isJsxElement(node) && !!node.openingElement.tagName.getText().match(UPPERCASE)
+    );
   }
 
   return;
+}
+
+function diagnoseNode(
+  ts: typeof TS,
+  node: ts.Node,
+  typeChecker: TypeChecker,
+  diagnostics: Diagnostic[],
+  isComponent: boolean
+): void {
+  // Checks both sides
+  if (ts.isBinaryExpression(node)) {
+    diagnoseNode(ts, node.left, typeChecker, diagnostics, isComponent);
+    diagnoseNode(ts, node.right, typeChecker, diagnostics, isComponent);
+    return;
+  }
+
+  // Checks the inner expression
+  if (ts.isConditionalExpression(node)) {
+    diagnoseNode(ts, node.whenTrue, typeChecker, diagnostics, isComponent);
+    diagnoseNode(ts, node.whenFalse, typeChecker, diagnostics, isComponent);
+    return;
+  }
+
+  const type = typeChecker.getTypeAtLocation(node);
+
+  // Safe can be ignored
+  if (isSafeAttribute(ts, type, node, typeChecker)) {
+    return;
+  }
+
+  // Arrays should be handled by the recursive function
+  if (typeChecker.isArrayLikeType(type)) {
+    let hasInnerJsx = false;
+
+    ts.forEachChild(node, function loopSourceNodes(child) {
+      // Check first to early exit
+      if (isJsx(ts, child)) {
+        hasInnerJsx = true;
+        return;
+      }
+
+      ts.forEachChild(child, (inner) =>
+        diagnoseNode(ts, inner, typeChecker, diagnostics, isComponent)
+      );
+    });
+
+    // Skips diagnostics if there is an inner JSX element
+    if (hasInnerJsx) {
+      return;
+    }
+  }
+
+  // Switch between component and element xss errors
+  if (isComponent || ts.isJsxFragment(node)) {
+    diagnostics.push(diagnostic(node, 'ComponentXss', 'Error'));
+  } else {
+    diagnostics.push(diagnostic(node, 'Xss', 'Error'));
+  }
 }
 
 export function isSafeAttribute(

@@ -42,6 +42,7 @@
 - [Getting Started](#getting-started)
 - [Running as CLI](#running-as-cli)
 - [Handling Warnings](#handling-warnings)
+- [Special cases](#special-cases)
 - [Vscode](#vscode)
 - [JSX](#jsx)
 
@@ -153,6 +154,23 @@ address this:
    ```
 
 <br />
+
+## Special cases
+
+1. Anything inside a `<script>` tag is allowed. If you are using a script tag, you want to
+   execute the content anyways.
+
+   ```tsx
+   let html = <script>{content}</script>;
+   ```
+
+2. Ternary and binary operations are evaluated in both sides separately and will throw
+   errors if any of the sides is not safe.
+
+    ```tsx
+    let html = <div>{isSafe ? safeContent : content}</div>;
+    //                                      ~~~~~~~
+    ```
 
 ## Vscode
 

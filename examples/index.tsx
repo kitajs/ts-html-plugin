@@ -10,6 +10,7 @@ const number = 1227;
 const unsafeNumber = 1227;
 const object = {};
 const union = 1 as string | number;
+const boolean = true as boolean;
 
 function Component(props: Html.PropsWithChildren) {
   return <div>{props.children}</div>;
@@ -66,6 +67,8 @@ export const valid = (
       <Component>{Html.escapeHtml(object)}</Component>
       asd
     </div>
+    <div>{boolean ? number : safeString}</div>
+    <div>{number || safeString}</div>
   </>
 );
 
@@ -98,6 +101,14 @@ export const invalid = (
       asd
     </div>
     <div safe>{Html.escapeHtml(object)}</div>
+    <div>{boolean ? number : html}</div>
+    <div>{number && html}</div>
+    <div>{html || safeString}</div>
+    <Component>
+      {['a', 'b', 'c'].map((i) => i === 'a' ? safeString : (
+        <Component>{i}</Component>
+      ))}
+    </Component>
   </div>
 );
 
