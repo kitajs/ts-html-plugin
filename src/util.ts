@@ -89,7 +89,7 @@ export function diagnoseJsxElement(
           // Element is using safe with escapeHtml
           (ts.isJsxExpression(exp) && exp.expression?.getText().match(ESCAPE_HTML_REGEX))
         ) {
-          diagnostics.push(diagnostic(exp, 'DoubleEscape', 'Error'));
+          diagnostics.push(diagnostic(safeAttribute, 'DoubleEscape', 'Error'));
           continue;
         }
 
@@ -130,7 +130,7 @@ export function diagnoseJsxElement(
       continue;
     }
 
-    diagnoseNode(
+    diagnoseExpression(
       ts,
       exp.expression,
       typeChecker,
@@ -142,24 +142,24 @@ export function diagnoseJsxElement(
   return;
 }
 
-function diagnoseNode(
+function diagnoseExpression(
   ts: typeof TS,
-  node: ts.Node,
+  node: ts.Expression,
   typeChecker: TypeChecker,
   diagnostics: Diagnostic[],
   isComponent: boolean
 ): void {
   // Checks both sides
   if (ts.isBinaryExpression(node)) {
-    diagnoseNode(ts, node.left, typeChecker, diagnostics, isComponent);
-    diagnoseNode(ts, node.right, typeChecker, diagnostics, isComponent);
+    diagnoseExpression(ts, node.left, typeChecker, diagnostics, isComponent);
+    diagnoseExpression(ts, node.right, typeChecker, diagnostics, isComponent);
     return;
   }
 
   // Checks the inner expression
   if (ts.isConditionalExpression(node)) {
-    diagnoseNode(ts, node.whenTrue, typeChecker, diagnostics, isComponent);
-    diagnoseNode(ts, node.whenFalse, typeChecker, diagnostics, isComponent);
+    diagnoseExpression(ts, node.whenTrue, typeChecker, diagnostics, isComponent);
+    diagnoseExpression(ts, node.whenFalse, typeChecker, diagnostics, isComponent);
     return;
   }
 
@@ -170,25 +170,24 @@ function diagnoseNode(
     return;
   }
 
-  // Arrays should be handled by the recursive function
-  if (typeChecker.isArrayLikeType(type)) {
-    let hasInnerJsx = false;
+  // Anything other than a identifier should be
+  if (!ts.isIdentifier(node)) {
+    let jsx;
 
+    // Finds a JSX element
     ts.forEachChild(node, function loopSourceNodes(child) {
-      // Check first to early exit
       if (isJsx(ts, child)) {
-        hasInnerJsx = true;
+        jsx = child;
         return;
       }
 
-      ts.forEachChild(child, (inner) =>
-        diagnoseNode(ts, inner, typeChecker, diagnostics, isComponent)
-      );
+      ts.forEachChild(child, loopSourceNodes);
     });
 
-    // Skips diagnostics if there is an inner JSX element
-    if (hasInnerJsx) {
-      return;
+    // If root JSX element found inside array, diagnose it,
+    // otherwise let the diagnostic pass
+    if (jsx) {
+      diagnoseJsxElement(ts, jsx, typeChecker, diagnostics);
     }
   }
 
