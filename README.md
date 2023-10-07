@@ -167,10 +167,10 @@ address this:
 2. Ternary and binary operations are evaluated in both sides separately and will throw
    errors if any of the sides is not safe.
 
-    ```tsx
-    let html = <div>{isSafe ? safeContent : content}</div>;
-    //                                      ~~~~~~~
-    ```
+   ```tsx
+   let html = <div>{isSafe ? safeContent : content}</div>;
+   //                                      ~~~~~~~
+   ```
 
 ## Vscode
 

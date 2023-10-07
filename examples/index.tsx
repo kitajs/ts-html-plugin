@@ -105,9 +105,7 @@ export const invalid = (
     <div>{number && html}</div>
     <div>{html || safeString}</div>
     <Component>
-      {['a', 'b', 'c'].map((i) => i === 'a' ? safeString : (
-        <Component>{i}</Component>
-      ))}
+      {['a', 'b', 'c'].map((i) => (i === 'a' ? safeString : <Component>{i}</Component>))}
     </Component>
   </div>
 );
