@@ -28,6 +28,7 @@ export const valid = (
     <div safe>hello {html}</div>
     <div safe>{unsafeNumber}</div>
     <div safe>{union}</div>
+    <script>{html}</script>
     <div>
       {['asda', 'b', 'c'].map((i) => (
         <>{Html.escapeHtml(i)}</>

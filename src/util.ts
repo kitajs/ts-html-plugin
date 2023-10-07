@@ -13,9 +13,7 @@ import * as Errors from './errors';
 const UPPERCASE = /[A-Z]/;
 const ESCAPE_HTML_REGEX = /^(\w+\.)?escapeHtml/i;
 
-/**
- * If the node is a JSX element or fragment
- */
+/** If the node is a JSX element or fragment */
 export function isJsx(ts: typeof TS, node: TS.Node): node is JsxElement | JsxFragment {
   return (
     node.kind === ts.SyntaxKind.JsxElement || node.kind === ts.SyntaxKind.JsxFragment
@@ -48,63 +46,21 @@ export function diagnoseJsxElement(
 ): void {
   const file = node.getSourceFile();
 
-  const safeAttribute = ts.isJsxElement(node) && getSafeAttribute(node.openingElement);
-
-  // Safe mode warnings
-  if (safeAttribute) {
-    if (
-      // Empty element
-      node.children.length === 0 ||
-      // Only text elements
-      (node.children.length === 1 && node.children[0]!.kind === ts.SyntaxKind.JsxText)
-    ) {
-      diagnostics.push({
-        category: ts.DiagnosticCategory.Warning,
-        code: Errors.UnusedSafe.code,
-        file,
-        length: safeAttribute.end - safeAttribute.pos - 1,
-        messageText: Errors.UnusedSafe.message,
-        start: safeAttribute.pos + 1
-      });
-
+  if (ts.isJsxElement(node)) {
+    // Script tags should be ignored
+    if (node.openingElement.tagName.getText() === 'script') {
       return;
     }
 
-    for (const exp of node.children) {
-      if (
-        // JSX Element inside safe
-        ts.isJsxElement(exp) ||
-        // Element is using safe with escapeHtml
-        (ts.isJsxExpression(exp) && exp.expression?.getText().match(ESCAPE_HTML_REGEX))
-      ) {
-        diagnostics.push({
-          category: ts.DiagnosticCategory.Error,
-          code: Errors.DoubleEscape.code,
-          file,
-          length: exp.end - exp.pos,
-          messageText: Errors.DoubleEscape.message,
-          start: exp.pos
-        });
+    const safeAttribute = getSafeAttribute(node.openingElement);
 
-        continue;
-      }
-
-      // Warn on unnecessary safe attributes
+    // Safe mode warnings
+    if (safeAttribute) {
       if (
-        ts.isJsxExpression(exp) &&
-        // has inner expression
-        exp.expression &&
-        // is expression safe
-        isSafeAttribute(
-          ts,
-          typeChecker.getTypeAtLocation(exp.expression!),
-          exp.expression!,
-          typeChecker
-        ) &&
-        // does not starts with unsafe
-        !exp.expression.getText().startsWith('unsafe') &&
-        // Avoids double warnings
-        !diagnostics.some((d) => d.start === safeAttribute.pos + 1 && d.file === file)
+        // Empty element
+        node.children.length === 0 ||
+        // Only text elements
+        (node.children.length === 1 && node.children[0]!.kind === ts.SyntaxKind.JsxText)
       ) {
         diagnostics.push({
           category: ts.DiagnosticCategory.Warning,
@@ -115,11 +71,60 @@ export function diagnoseJsxElement(
           start: safeAttribute.pos + 1
         });
 
-        continue;
+        return;
       }
-    }
 
-    return;
+      for (const exp of node.children) {
+        if (
+          // JSX Element inside safe
+          ts.isJsxElement(exp) ||
+          // Element is using safe with escapeHtml
+          (ts.isJsxExpression(exp) && exp.expression?.getText().match(ESCAPE_HTML_REGEX))
+        ) {
+          diagnostics.push({
+            category: ts.DiagnosticCategory.Error,
+            code: Errors.DoubleEscape.code,
+            file,
+            length: exp.end - exp.pos,
+            messageText: Errors.DoubleEscape.message,
+            start: exp.pos
+          });
+
+          continue;
+        }
+
+        // Warn on unnecessary safe attributes
+        if (
+          ts.isJsxExpression(exp) &&
+          // has inner expression
+          exp.expression &&
+          // is expression safe
+          isSafeAttribute(
+            ts,
+            typeChecker.getTypeAtLocation(exp.expression!),
+            exp.expression!,
+            typeChecker
+          ) &&
+          // does not starts with unsafe
+          !exp.expression.getText().startsWith('unsafe') &&
+          // Avoids double warnings
+          !diagnostics.some((d) => d.start === safeAttribute.pos + 1 && d.file === file)
+        ) {
+          diagnostics.push({
+            category: ts.DiagnosticCategory.Warning,
+            code: Errors.UnusedSafe.code,
+            file,
+            length: safeAttribute.end - safeAttribute.pos - 1,
+            messageText: Errors.UnusedSafe.message,
+            start: safeAttribute.pos + 1
+          });
+
+          continue;
+        }
+      }
+
+      return;
+    }
   }
 
   // Look for expressions
