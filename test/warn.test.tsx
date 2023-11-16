@@ -3,7 +3,7 @@ import { it } from 'node:test';
 import { UnusedSafe } from '../src/errors';
 import { TSLangServer } from './util/lang-server';
 
-it('Warns on unused safe tags', async () => {
+it('Warn on unused `safe` tags', async () => {
   await using server = new TSLangServer(__dirname);
 
   const diagnostics = await server.openWithDiagnostics/* tsx */ `

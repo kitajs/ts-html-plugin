@@ -3,7 +3,7 @@ import { it } from 'node:test';
 import { DoubleEscape } from '../src/errors';
 import { TSLangServer } from './util/lang-server';
 
-it('Avoids escaping twice', async () => {
+it('Avoid escaping twice', async () => {
   await using server = new TSLangServer(__dirname);
 
   const diagnostics = await server.openWithDiagnostics/* tsx */ `

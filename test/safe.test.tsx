@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import { it } from 'node:test';
 import { TSLangServer } from './util/lang-server';
 
-it('Safe Html tags', async () => {
+it('Allow correct xss usage', async () => {
   await using server = new TSLangServer(__dirname);
 
   const diagnostics = await server.openWithDiagnostics/* tsx */ `

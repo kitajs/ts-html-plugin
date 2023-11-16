@@ -3,7 +3,7 @@ import { it } from 'node:test';
 import { Xss } from '../src/errors';
 import { TSLangServer } from './util/lang-server';
 
-it('Works when using operators', async () => {
+it('Operators are evaluated normally', async () => {
   await using server = new TSLangServer(__dirname);
 
   const diagnostics = await server.openWithDiagnostics/* tsx */ `
