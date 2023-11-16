@@ -28,5 +28,8 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Link build
+        run: pnpm install --frozen-lockfile
+
       - name: Test
         run: pnpm test
