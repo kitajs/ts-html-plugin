@@ -296,7 +296,7 @@ information.
 
    ```tsx
    const html = <div>{true ? safeContent : content}</div>;
-   //                                    ~~~~~~~
+   //                                      ~~~~~~~
    ```
 
 <br />
