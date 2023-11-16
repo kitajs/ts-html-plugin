@@ -105,7 +105,7 @@ function fileExists(p: string) {
 }
 
 async function main() {
-  const args = await yargs(hideBin(process.argv)).help(false).argv;
+  const args = await yargs(hideBin(process.argv)).help(false).version( version).argv;
 
   if (args.help || args.h) {
     console.log(help);
