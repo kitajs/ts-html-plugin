@@ -15,9 +15,7 @@ const ESCAPE_HTML_REGEX = /^(\w+\.)?escapeHtml/i;
 
 /** If the node is a JSX element or fragment */
 export function isJsx(ts: typeof TS, node: TS.Node): node is JsxElement | JsxFragment {
-  return (
-    node.kind === ts.SyntaxKind.JsxElement || node.kind === ts.SyntaxKind.JsxFragment
-  );
+  return ts.isJsxElement(node) || ts.isJsxFragment(node);
 }
 
 export function recursiveDiagnoseJsxElements(
@@ -43,6 +41,8 @@ function diagnostic(
   error: keyof typeof Errors,
   category: keyof typeof TS.DiagnosticCategory
 ): ts.Diagnostic {
+  console.trace('diagnostic', node.getText(), error, category);
+
   return {
     category: ts.DiagnosticCategory[category],
     messageText: Errors[error].message,
@@ -149,6 +149,16 @@ function diagnoseExpression(
   diagnostics: Diagnostic[],
   isComponent: boolean
 ): void {
+  // Unwrap parenthesis
+  if (ts.isParenthesizedExpression(node)) {
+    node = node.expression;
+  }
+
+  // Ignores JSX elements as they are already diagnosed by the loopChildNodes
+  if (isJsx(ts, node)) {
+    return;
+  }
+
   // Checks both sides
   if (ts.isBinaryExpression(node)) {
     diagnoseExpression(ts, node.left, typeChecker, diagnostics, isComponent);
@@ -170,22 +180,28 @@ function diagnoseExpression(
     return;
   }
 
-  // Anything other than a identifier should be
+  // Anything other than a identifier should be diagnosed
   if (!ts.isIdentifier(node)) {
-    let tags = node.getChildren().filter((c) => isJsx(ts, c));
+    let hadJsx = false;
+
+    for (const tag of node.getChildren()) {
+      if (!isJsx(ts, tag)) {
+        continue;
+      }
+
+      hadJsx = true;
+
+      diagnoseJsxElement(
+        ts,
+        tag as JsxElement | ts.JsxFragment,
+        typeChecker,
+        diagnostics
+      );
+    }
 
     // If root JSX element found inside array, diagnose it,
     // otherwise let the diagnostic pass
-    if (tags.length) {
-      for (const tag of tags) {
-        diagnoseJsxElement(
-          ts,
-          tag as JsxElement | ts.JsxFragment,
-          typeChecker,
-          diagnostics
-        );
-      }
-
+    if (hadJsx) {
       return;
     }
   }

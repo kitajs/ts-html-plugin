@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2022",
     "jsx": "react",
     "jsxFactory": "Html.createElement",
     "jsxFragmentFactory": "Html.Fragment",
@@ -35,5 +35,5 @@
     "skipDefaultLibCheck": true,
     "plugins": [{ "name": "self" }]
   },
-  "include": ["src", "examples"]
+  "include": ["src", "test"]
 }

@@ -23,7 +23,7 @@
     "dev": "tsc -p tsconfig.build.json --watch",
     "format": "prettier --write .",
     "prepack": "npm run build",
-    "test": "tsc --noEmit"
+    "test": "node --require @swc-node/register --test test/**/*.test.{ts,tsx}"
   },
   "dependencies": {
     "chalk": "^4.1.2",
@@ -31,15 +31,18 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@arthurfiorette/prettier-config": "^1.0.11",
-    "@types/node": "^20.8.3",
-    "@types/yargs": "^17.0.28",
-    "prettier": "^3.0.3",
+    "@arthurfiorette/prettier-config": "^1.0.12",
+    "@swc-node/register": "^1.6.8",
+    "@swc/helpers": "^0.5.3",
+    "@types/node": "^20.9.0",
+    "@types/yargs": "^17.0.31",
+    "fast-defer": "^1.1.8",
+    "prettier": "^3.1.0",
     "self": "file:."
   },
   "peerDependencies": {
-    "@kitajs/html": ">=3",
-    "typescript": ">=5"
+    "@kitajs/html": "^3.0.8",
+    "typescript": "^5.2.2"
   },
   "packageManager": "pnpm@8.7.5"
 }
