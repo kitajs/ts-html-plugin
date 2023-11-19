@@ -161,8 +161,26 @@ function diagnoseExpression(
 
   // Checks both sides
   if (ts.isBinaryExpression(node)) {
-    diagnoseExpression(ts, node.left, typeChecker, diagnostics, isComponent);
+    // Ignores operations which results in a boolean
+    switch (node.operatorToken.kind) {
+      case ts.SyntaxKind.EqualsEqualsEqualsToken:
+      case ts.SyntaxKind.EqualsEqualsToken:
+      case ts.SyntaxKind.ExclamationEqualsEqualsToken:
+      case ts.SyntaxKind.ExclamationEqualsToken:
+      case ts.SyntaxKind.GreaterThanToken:
+      case ts.SyntaxKind.GreaterThanEqualsToken:
+      case ts.SyntaxKind.LessThanEqualsToken:
+      case ts.SyntaxKind.LessThanToken:
+      case ts.SyntaxKind.InstanceOfKeyword:
+      case ts.SyntaxKind.InKeyword:
+        return;
+    }
+
+    // We do not need to evaluate the left side of the expression
+    // as its value will only be used if its falsy, which cannot have
+    // XSS content
     diagnoseExpression(ts, node.right, typeChecker, diagnostics, isComponent);
+
     return;
   }
 
@@ -170,6 +188,7 @@ function diagnoseExpression(
   if (ts.isConditionalExpression(node)) {
     diagnoseExpression(ts, node.whenTrue, typeChecker, diagnostics, isComponent);
     diagnoseExpression(ts, node.whenFalse, typeChecker, diagnostics, isComponent);
+    // ignore node.condition because its value will never be rendered
     return;
   }
 

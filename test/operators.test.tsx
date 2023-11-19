@@ -12,7 +12,7 @@ it('Operators are evaluated normally', async () => {
         <div>{boolean ? number : html}</div>
         <div>{boolean ? number : (html)}</div>
         <div>{boolean ? number : <div>{html}</div>}</div>
-        <div>{boolean ? (number) : (<div><div>{html}</div></div>)}       </div>
+        <div>{boolean ? (number) : (<div><div>{html}</div></div>)}</div>
 
         <div>{number && html}</div>
         <div>{number && (html)}</div>
@@ -36,6 +36,15 @@ it('Operators are evaluated normally', async () => {
         <div>{<div>Safe!</div> || safeString}</div>
         <div>{(<div>Safe!</div>) || safeString}</div>
         <div>{(<div><div>Deep safe!</div></div>) || safeString}</div>
+
+        {/* Booleans */}
+        <div>{html !== 'Html'}</div>
+        <div>{html >= 'Html'}</div>
+        <div>{html <= 'Html'}</div>
+        <div>{html > 'Html'}</div>
+        <div>{html < 'Html'}</div>
+        <div>{'html' in ({ html })}</div>
+        <div>{new String(html) instanceof String}</div>
       </>
     );
 `;
@@ -99,20 +108,6 @@ it('Operators are evaluated normally', async () => {
       category: 'error'
     },
 
-    {
-      start: { line: 46, offset: 15 },
-      end: { line: 46, offset: 19 },
-      text: Xss.message,
-      code: Xss.code,
-      category: 'error'
-    },
-    {
-      start: { line: 47, offset: 16 },
-      end: { line: 47, offset: 20 },
-      text: Xss.message,
-      code: Xss.code,
-      category: 'error'
-    },
     {
       start: { line: 48, offset: 21 },
       end: { line: 48, offset: 25 },
