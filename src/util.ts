@@ -34,6 +34,18 @@ export function recursiveDiagnoseJsxElements(
       diagnoseJsxElement(ts, node, typeChecker, original);
     }
   });
+
+  // Filter out duplicates
+  for (let i = 0; i < original.length; i++) {
+    for (let j = i + 1; j < original.length; j++) {
+      if (
+        original[i]!.start === original[j]!.start &&
+        original[i]!.length === original[j]!.length
+      ) {
+        original.splice(j--, 1);
+      }
+    }
+  }
 }
 
 function diagnostic(
