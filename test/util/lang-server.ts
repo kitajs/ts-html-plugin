@@ -20,7 +20,7 @@ const TEST_FILE = path.join(__dirname, 'index.tsx');
 const ROOT = path.join(__dirname, '..');
 
 export const TEST_HELPERS = /* tsx */ `
-  import { Html, PropsWithChildren } from '@kitajs/html';
+  import Html, { PropsWithChildren } from '@kitajs/html';
 
   const date = new Date();
   const safeString: string = 'safe';

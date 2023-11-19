@@ -274,8 +274,12 @@ export function isSafeAttribute(
     // Allows Html.Children
     if (
       type.aliasSymbol.escapedName === 'Children' &&
-      // @ts-expect-error - Fast way of checking
-      type.aliasSymbol.parent?.escapedName === 'Html'
+      // @ts-expect-error - When using export namespace X {} and export default X, parent.escapedName
+      // ends up as the original namespace name, not the quoted export name.
+      (type.aliasSymbol.parent?.escapedName === 'Html' ||
+        // @ts-expect-error - When using export as namespace X, parent.escapedName ends up
+        // as a complete (without resolving symlinks) quoted import path to its original file.
+        type.aliasSymbol.parent?.escapedName.endsWith('@kitajs/html/index"'))
     ) {
       return true;
     }

@@ -29,7 +29,7 @@ it('Allow correct xss usage', async () => {
           {['a', 'b', 'c'].map((i) => (
             <div safe>{i}</div>
           ))}
-        </div>{' '}
+        </div>
         <div>
           {[1, 2, 3].map((i) => (
             <>{i}</>
