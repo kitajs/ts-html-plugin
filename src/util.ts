@@ -41,8 +41,6 @@ function diagnostic(
   error: keyof typeof Errors,
   category: keyof typeof TS.DiagnosticCategory
 ): ts.Diagnostic {
-  console.trace('diagnostic', node.getText(), error, category);
-
   return {
     category: ts.DiagnosticCategory[category],
     messageText: Errors[error].message,
@@ -236,7 +234,7 @@ function diagnoseExpression(
 export function isSafeAttribute(
   ts: typeof TS,
   type: Type | undefined,
-  expression: Node,
+  expression: ts.Expression,
   checker: TypeChecker
 ): boolean {
   // Nothing to do if type cannot be resolved
@@ -255,8 +253,8 @@ export function isSafeAttribute(
       type.aliasSymbol.escapedName === 'Element' &&
       // @ts-expect-error - Fast way of checking
       type.aliasSymbol.parent?.escapedName === 'JSX' &&
-      // Only allows in .map() or other method calls
-      ts.isCallExpression(expression)
+      // Only allows in .map(), other method calls or the expression itself
+      (ts.isCallExpression(expression) || ts.isIdentifier(expression))
     ) {
       return true;
     }

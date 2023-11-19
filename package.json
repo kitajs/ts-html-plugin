@@ -22,7 +22,7 @@
     "dev": "tsc -p tsconfig.build.json --watch",
     "format": "prettier --write .",
     "prepack": "npm run build",
-    "test": "node --require @swc-node/register --test test/**/*.test.{ts,tsx}"
+    "test": "node --require @swc-node/register --test test/**/*.test.ts"
   },
   "dependencies": {
     "chalk": "^4.1.2",
