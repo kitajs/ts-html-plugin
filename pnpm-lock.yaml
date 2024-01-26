@@ -33,7 +33,7 @@ devDependencies:
     version: 0.5.3
   '@types/node':
     specifier: ^20.9.2
-    version: 20.11.6
+    version: 20.11.7
   '@types/yargs':
     specifier: ^17.0.31
     version: 17.0.32
@@ -301,8 +301,8 @@ packages:
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
     dev: true
 
-  /@types/node@20.11.6:
-    resolution: {integrity: sha512-+EOokTnksGVgip2PbYbr3xnR7kZigh4LbybAfBAw5BpnQ+FqBYUsvCEjYd70IXKlbohQ64mzEYmMtlWUY8q//Q==}
+  /@types/node@20.11.7:
+    resolution: {integrity: sha512-GPmeN1C3XAyV5uybAf4cMLWT9fDWcmQhZVtMFu7OR32WjrqGG+Wnk2V1d0bmtUyE/Zy1QJ9BxyiTih9z8Oks8A==}
     dependencies:
       undici-types: 5.26.5
     dev: true
