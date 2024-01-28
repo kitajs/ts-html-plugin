@@ -14,16 +14,13 @@ it('Ensures readme checks will throw error', async () => {
     );
 `;
 
-  assert.deepStrictEqual(
-    diagnostics.body,
-    [
-      {
-        category: 'error',
-        code: Xss.code,
-        end: { line: 36, offset: 26 },
-        start: { line: 36, offset: 15 },
-        text: Xss.message
-      }
-    ]
-  );
+  assert.deepStrictEqual(diagnostics.body, [
+    {
+      category: 'error',
+      code: Xss.code,
+      end: { line: 36, offset: 26 },
+      start: { line: 36, offset: 15 },
+      text: Xss.message
+    }
+  ]);
 });

@@ -11,7 +11,7 @@ import type {
 import * as Errors from './errors';
 
 const UPPERCASE = /[A-Z]/;
-const ESCAPE_HTML_REGEX = /^(\w+\.)?escapeHtml/i;
+const ESCAPE_HTML_REGEX = /^(\w+\.)?(escapeHtml|e|escape)/i;
 
 /** If the node is a JSX element or fragment */
 export function isJsx(ts: typeof TS, node: TS.Node): node is JsxElement | JsxFragment {
