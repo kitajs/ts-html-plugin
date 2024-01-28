@@ -31,10 +31,10 @@ it('Allow correct xss usage', async () => {
           ))}
         </div>
         <div>
-        {['asda', 'b', 'c'].map((i) => (
-          ${'<>{Html.escape`${i} some text`}</>'}
-        ))}
-      </div>
+          {['asda', 'b', 'c'].map((i) => (
+            ${'<>{Html.escape`${i} some text`}</>'}
+          ))}
+        </div>
         <div>
           {['a', 'b', 'c'].map((i) => (
             <div safe>{i}</div>
@@ -55,6 +55,8 @@ it('Allow correct xss usage', async () => {
         <div>{Html.escapeHtml(object)}</div>
         ${'<div>{Html.e`${html}`}</div>'}
         ${'<div>{Html.e`${object}`}</div>'}
+        ${'<div>{e`${html}`}</div>'}
+        ${'<div>{e`${object}`}</div>'}
         ${'<div>{Html.escape`${html}`}</div>'}
         ${'<div>{Html.escape`${object}`}</div>'}
         <div>{boolean ? number : safeString}</div>

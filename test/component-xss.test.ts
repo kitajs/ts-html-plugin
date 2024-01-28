@@ -87,6 +87,15 @@ it('Ensure <Component /> children are safe using "e" tag function', async () => 
           ${'<Component>{Html.e`${object}`}</Component>'}
           asd
         </div>
+        <div>
+          {['a', 'b', 'c'].map((i) => (
+            ${'<Component>{e`${i}`}</Component>'}
+          ))}
+        </div>
+        <div>
+          ${'<Component>{e`${object}`}</Component>'}
+          asd
+        </div>
       </>
     );
 `;
