@@ -17,6 +17,7 @@ it('Avoid escaping twice', async () => {
           asd
         </div>
         <div safe>{Html.escapeHtml(object)}</div>
+        ${'<div safe>{Html.e`${object}`}</div>'}
       </>
     );
 `;
@@ -39,6 +40,13 @@ it('Avoid escaping twice', async () => {
     {
       start: { line: 43, offset: 14 },
       end: { line: 43, offset: 18 },
+      text: DoubleEscape.message,
+      code: DoubleEscape.code,
+      category: 'error'
+    },
+    {
+      start: { line: 44, offset: 14 },
+      end: { line: 44, offset: 18 },
       text: DoubleEscape.message,
       code: DoubleEscape.code,
       category: 'error'

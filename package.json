@@ -22,7 +22,8 @@
     "dev": "tsc -p tsconfig.build.json --watch",
     "format": "prettier --write .",
     "prepack": "npm run build",
-    "test": "node --require @swc-node/register --test test/**/*.test.ts"
+    "test": "node --require @swc-node/register --test test/**/*.test.ts",
+    "test-procedure": "pnpm build && pnpm install && pnpm test"
   },
   "dependencies": {
     "chalk": "^4.1.2",
