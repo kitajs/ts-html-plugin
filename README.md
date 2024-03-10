@@ -1,3 +1,8 @@
+> [!CAUTION]
+> This repository was moved to the [kitajs/html monorepo](https://github.com/kitajs/html/tree/master/packages/ts-html-plugin#readme) as of 10/03/2024.
+
+---
+
 <p align="center">
    <b>Using this package?</b> Please consider <a href="https://github.com/sponsors/arthurfiorette" target="_blank">donating</a> to support my open source work ❤️
   <br />
